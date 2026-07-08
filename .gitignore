@@ -1,0 +1,23 @@
+# Python files
+__pycache__
+**/__pycache__
+
+# Produced figures
+*.key
+*.txt
+.notebook
+test/
+generation/output/
+*checkpoint.ipynb
+*gamestates_*
+dataset_flat/
+cached_states/
+*_logs*
+logs_*
+
+
+# VS Code
+.vscode
+.VSCodeCounter
+models/gpt/open-ai-key-vlp
+models/gemini/key.txt

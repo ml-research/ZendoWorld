@@ -1,0 +1,37 @@
+name: zendo
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - pytorch=2.5.1
+  - torchvision=0.20.1
+  - torchaudio=2.5.1
+  - numpy=1.23.3
+  - scipy=1.9.1
+  - matplotlib=3.6.0
+  - networkx=3.4
+  - pyyaml=6.0.3
+  - requests=2.33.0
+  - tqdm=4.67.3
+  - pip:
+      - pandas==1.5.3
+      - pillow==10.4.0
+      - transformers==4.38.2
+      - tokenizers==0.15.2
+      - safetensors==0.7.0
+      - huggingface-hub==0.36.2
+      - openai==2.30.0
+      - tiktoken==0.12.0
+      - google-generativeai
+      - qwen-vl-utils
+      - pyswip==0.3.3
+      - ray==2.9.3
+      - optuna==3.6.1
+      - vose==0.0.2
+      - rtpt
+      - pynvml
+      - statsmodels
