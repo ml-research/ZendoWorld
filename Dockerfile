@@ -22,7 +22,7 @@ ENV PATH=/opt/conda/bin:$PATH
 # Conda-Env
 WORKDIR /workspace
 COPY environment.yml .
-RUN conda env create -n zendo -f environment-complete.yml && conda clean --all -y
+RUN conda env create -n zendo -f environment.yml && conda clean --all -y
 SHELL ["conda", "run", "-n", "zendo", "/bin/bash", "-c"]
 
 # Optional: Repo gleich mit rein
