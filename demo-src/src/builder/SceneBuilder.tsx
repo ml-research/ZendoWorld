@@ -944,6 +944,18 @@ const SceneBuilder = forwardRef<SceneBuilderHandle, Props>(function SceneBuilder
 
   return (
     <div className="sb panel">
+      {/* ── Info (moved above the body so the canvas can take full row width) ── */}
+      <aside className="sb-info">
+        <div className="sb-info-title">Stacking &amp; locking</div>
+        <ul>
+          <li><strong>Side-by-side:</strong> pieces snap next to each other with a small overlap at the same height.</li>
+          <li><strong>On top:</strong> drop above another piece in the same column to stack directly on top.</li>
+          <li><strong>Floor:</strong> pieces on the grey stripe are on the floor. Click without dragging to cycle orientation.</li>
+          <li><strong>Pointing:</strong> flat blocks/pyramids and cheesecake/doorstop wedges show a <strong>→</strong> on hover — drag it to another piece.</li>
+        </ul>
+        <p className="sb-info-note">Build scenes that could exist in the <strong>real world</strong> — no floating pieces. Maximum of 8 pieces per scene.</p>
+      </aside>
+
       <div className="sb-body">
 
         {/* ── Palette ── */}
@@ -1088,20 +1100,6 @@ const SceneBuilder = forwardRef<SceneBuilderHandle, Props>(function SceneBuilder
             )}
           </div>
         </div>
-
-        {/* ── Info ── */}
-        <aside className="sb-info">
-          <div className="sb-info-title">Stacking &amp; locking</div>
-          <p>When you drop a piece near another, it locks into a realistic position:</p>
-          <ul>
-            <li><strong>Side-by-side:</strong> pieces snap next to each other with a small overlap at the same height.</li>
-            <li><strong>On top:</strong> drop above another piece in the same column to stack directly on top.</li>
-            <li><strong>Floor:</strong> pieces on the grey stripe are on the floor. Click without dragging to cycle orientation.</li>
-            <li><strong>Pointing:</strong> flat blocks/pyramids and cheesecake/doorstop wedges show a <strong>→</strong> on hover — drag it to another piece.</li>
-          </ul>
-          <p className="sb-info-note">Build scenes that could exist in the <strong>real world</strong>: no floating pieces or unstable shapes unless clearly supported.</p>
-          <p className="sb-info-note">You can add a <strong>maximum of 8 pieces</strong> per scene.</p>
-        </aside>
 
       </div>
     </div>

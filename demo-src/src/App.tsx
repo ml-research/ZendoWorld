@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import type { SceneJSON } from "./types";
 import SceneBuilder from "./builder/SceneBuilder";
 import { POSITIVE_SCENES, NEGATIVE_SCENES } from "./seedScenes";
-import { ruleMatches, trueLabel, TRUE_RULE_TEXT, countFlat } from "./ruleCheck";
+import { ruleMatches, trueLabel, TRUE_RULE_TEXT } from "./ruleCheck";
 import "./App.css";
 
 type Phase = "intro" | "build" | "label" | "rule" | "result";
@@ -19,7 +19,6 @@ export default function App() {
   const [outcome, setOutcome] = useState<"won" | "lost" | null>(null);
 
   const actualLabel = useMemo(() => trueLabel(scene), [scene]);
-  const flatCount = useMemo(() => countFlat(scene), [scene]);
   const labelWasCorrect = guessedLabel !== null && guessedLabel === actualLabel;
 
   function reset() {
@@ -134,8 +133,7 @@ export default function App() {
         <section className="demo-card">
           <div className={`demo-feedback ${labelWasCorrect ? "ok" : "bad"}`}>
             <strong>{labelWasCorrect ? "Correct label!" : "Wrong label."}</strong>{" "}
-            The true label of your scene is <strong>{actualLabel === "YES" ? "positive" : "negative"}</strong>{" "}
-            ({flatCount} flat piece{flatCount === 1 ? "" : "s"}).
+            The true label of your scene is <strong>{actualLabel === "YES" ? "positive" : "negative"}</strong>.
           </div>
 
           <h2>Step 3 &mdash; guess the rule</h2>
@@ -145,7 +143,7 @@ export default function App() {
             type="text"
             value={ruleGuess}
             onChange={(e) => setRuleGuess(e.target.value)}
-            placeholder="e.g. there are exactly 3 flat pieces"
+            placeholder="e.g. there are 4 red pieces"
             onKeyDown={(e) => {
               if (e.key === "Enter" && ruleGuess.trim()) {
                 setOutcome(ruleMatches(ruleGuess) ? "won" : "lost");
