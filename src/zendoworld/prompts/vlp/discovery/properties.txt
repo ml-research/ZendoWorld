@@ -1,0 +1,36 @@
+# Property Discovery Task
+
+You are analyzing a set of images to identify important properties that describe objects in the image set.
+
+## Objective
+
+Discover **atomic visual properties** that characterize objects in the images. Each property should be a single attribute, not a combination.
+
+## Instructions
+
+1. **Examine all images carefully** - Look for properties that apply to the relevant objects across the image set
+2. **Identify important properties** - Focus on significant, clearly observable properties that meaningfully describe objects
+3. **Consider property variation** - Properties that vary across images or objects may be particularly noteworthy
+4. **Prioritize meaningful properties** - Choose properties that help distinguish or characterize objects (e.g., color, size, position, orientation, state)
+5. **Return exactly {n} properties** - If fewer notable properties exist, return as many as available
+6. **Use descriptive names** - Name properties clearly and specifically (e.g., "red" rather than "colored", "horizontal" rather than "oriented")
+
+## Relevant Objects
+The objects to consider are: {objects}
+
+## Property Categories
+- **Visual attributes**: colors (red, green, blue, yellow etc.)
+- **Geometric attributes**: orientations (upright, flat, upside_down etc.)
+- **Groundedness**: grounded, ungrounded
+
+## Output Requirements
+- Return a Python list assigned to variable `properties`
+- Include only the Python code, no explanations or comments
+- If no notable properties are found, return an empty list `[]`
+- Use single-word or simple property names (e.g., "blue", "upright")
+- Do NOT include object types as properties (e.g., "wedge")
+
+## Example Format
+```python
+properties = ["red", "blue", "yellow", "upright", "flat", "doorstop", "grounded", "small"]
+```

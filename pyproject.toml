@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "zendoworld"
+version = "0.1.0"
+description = "Visual and symbolic Zendo experiments and program synthesis"
+readme = "README.md"
+requires-python = ">=3.10"
+
+[project.scripts]
+zendoworld = "zendoworld.cli.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+zendoworld = ["_legacy_modules.json"]
+"zendoworld.rules" = ["*.pl"]
+"zendoworld.prompts" = ["vlp/*.txt", "vlp/discovery/*.txt", "vlp/invention/*.txt", "vlp/vlm_functions/*.txt"]
+"zendoworld.rendering" = ["configs/*.yml", "assets/*.json", "assets/*.blend", "assets/shapes/*.blend"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

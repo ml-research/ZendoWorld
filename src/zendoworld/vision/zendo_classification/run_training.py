@@ -1,0 +1,70 @@
+from zendoworld.paths import VISION_WEIGHTS
+import random
+import copy
+from pathlib import Path
+from zendoworld.vision.zendo_classification.train_model import run_training
+
+# Base configuration
+base_cfg = {
+    "path": "",
+    "seed": 42,
+
+    # Model
+    "max_objects": 7,
+    "token_dim": 384,
+
+    # Lexicons
+    "color_lexicon": ["red", "blue", "yellow"],
+    "shape_lexicon": ["block", "wedge", "pyramid"],
+    "orientation_lexicon": ["upright", "upside_down", "flat", "cheesecake"],
+
+    # Data
+    "dataset_paths": [
+        "../synthetic_dataset/t1", "../synthetic_dataset/t2", "../synthetic_dataset/t3"
+    ],
+    "val_percent": 0.1,
+    "image_size": [480, 640],
+    "batch_size": 16,
+
+    # Augmentations
+    "color_jitter": {
+        "brightness": 0.2,
+        "contrast": 0.2,
+        "saturation": 0.2,
+        "hue": 0.05
+    },
+
+    # Optimization
+    "lr": 5.8e-5,
+    "weight_decay": 7e-3,
+    "lr_step_size": 10,
+    "lr_gamma": 0.65,
+    "num_epochs": 75,
+    "dropout": 0.23,
+
+    "weight_path": str(VISION_WEIGHTS),
+    "scheduler_path": "scheduler.pt",
+
+    # Head weights
+    "classification": 0.126,
+    "relations": 0.12,
+    "bbox": 0.00997,
+
+    "layers": 4,
+    "color_mult_layer": False,
+    "shape_mult_layer": False,
+    "orientation_mult_layer": False,
+    "presence_mult_layer": False,
+    "pointing_mult_layer": True,
+    "touching_mult_layer": True,
+    "bbox_mult_layer": True,
+}
+
+# Run 3 experiments with random seeds
+base_output = Path("outputs/training/vision")
+base_output.mkdir(exist_ok=True)
+seed = random.randint(0, 10000)
+cfg = copy.deepcopy(base_cfg)
+cfg["seed"] = seed
+cfg["path"] = str(base_output / f"experiment_{seed}")
+run_training(cfg)

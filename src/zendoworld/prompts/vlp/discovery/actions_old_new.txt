@@ -1,0 +1,7 @@
+You are analyzing images to identify notable actions performed by objects: {objects}. Focus on actions that meaningfully distinguish or describe what objects are doing (movements, behaviors, states of activity). Consider actions that vary across images or objects. Use clear, specific names (e.g., "running" not "moving", "sitting" not "positioned"). Return exactly {n} actions in a Python list.
+
+Answer format:
+```python
+actions = [...]
+```
+No comments or explanations. If no actions found, return [].

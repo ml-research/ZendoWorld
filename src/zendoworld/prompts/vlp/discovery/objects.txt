@@ -1,0 +1,26 @@
+# Object Discovery Task
+
+You are analyzing a set of images to identify the base types of objects that appear.
+
+## Objective
+Discover the **fundamental shape or kind** of each object. Do NOT include visual attributes like color, size, or orientation — those are properties, not object types.
+
+## Instructions
+1. **Examine all images carefully** - Look for distinct types of objects across the image set
+2. **Use atomic type names only** - Name each object by its base shape/kind (e.g., "block", "wedge", "pyramid", "cube", "sphere", "cylinder")
+3. **Do NOT combine attributes** - "red block" is wrong, use "block". "tall yellow prism" is wrong, use "prism"
+4. **Merge duplicates** - If the same shape appears in different colors or sizes, list it only once
+5. **Return exactly {n} objects** - If fewer types exist, return as many as available
+
+## Output Requirements
+- Return a Python list assigned to variable `objects`
+- Include only the Python code, no explanations or comments
+- If no notable objects are found, return an empty list `[]`
+- Use short, atomic names (e.g., "block", "wedge", "pyramid", "cone", "ball")
+
+## Example Format
+```python
+objects = ["block", "wedge", "pyramid", "cylinder", "sphere"]
+```
+
+**Your response should contain only the Python code block above.**

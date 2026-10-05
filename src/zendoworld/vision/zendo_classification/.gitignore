@@ -1,0 +1,10 @@
+.idea/
+
+*__pycache__
+
+*.key
+*.json
+*.png
+*.txt
+
+data/

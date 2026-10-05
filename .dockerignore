@@ -1,0 +1,11 @@
+.git
+**/__pycache__
+.pytest_cache
+build
+*.egg-info
+outputs
+configs/credentials
+data
+dataset_flat
+weights
+.DS_Store

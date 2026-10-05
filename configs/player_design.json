@@ -1,0 +1,17 @@
+{
+  "Oracle Agent": { "color": "#D31F17", "linestyle": "-",  "marker": "o" },
+  "Oracle Agent Symbolic": { "color": "#D31F17", "linestyle": "-",  "marker": "o"},
+  "Uniform NeSy Player":  { "color": "#D31F17", "linestyle": "-",  "marker": "o" },
+  "Oracle Agent (Random) Symbolic":  { "color": "#9966CC", "linestyle": "--", "marker": "s"},
+  "Oracle Agent (Random)":  { "color": "#9966CC", "linestyle": "--", "marker": "s"},
+  "Bayesian Agent":      { "color": "#62C8D3", "linestyle": "-.", "marker": "^" },
+  "Bayesian Agent Symbolic":      { "color": "#62C8D3", "linestyle": "-.", "marker": "^"},
+  "LLM-SMC-S Player":     { "color": "#62C8D3", "linestyle": "-.", "marker": "^" },
+  "VLM Agent":      { "color": "#F47A00", "linestyle": ":",  "marker": "D" },
+  "VLM Agent Symbolic":      { "color": "#F47A00", "linestyle": ":",  "marker": "D"},
+  "LLM Player":     { "color": "#62C8D3", "linestyle": ":",  "marker": "D" },
+  "VLP Agent":            { "color": "#007191", "linestyle": "--", "marker": "v" },
+  "VLP Agent Symbolic":            { "color": "#007191", "linestyle": "--", "marker": "v"},
+  "VLP Player":           { "color": "#007191", "linestyle": "--", "marker": "v" },
+  "Human":               { "color": "#122740", "linestyle": "-",  "marker": "*" }
+}

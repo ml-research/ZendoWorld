@@ -1,0 +1,58 @@
+You are designing a typed DSL.
+
+Goal:
+Given the type system and example programs below, propose new DSL functions (and optionally new types) that are consistent, composable, and useful.
+
+Hard rules:
+1) Every function must have a type signature and be type-correct under the provided type system.
+1a) Use signature format "A -> B -> C". For lists, write LIST[TYPE]. Do NOT use Arrow(...) or List(...).
+2) You may introduce new types ONLY if necessary. If you add a type, define it precisely.
+3) IMG is opaque. The only permitted way to use an IMG is via functions explicitly marked kind=VLM.
+4) VLM functions must output ONLY symbolic types. They must describe uncertainty and failure modes.
+5) For each proposed function: name, kind (Symbolic or VLM), signature, arg_names, semantics, at least 2 typed examples, preconditions, failure_modes.
+6) For VLM functions: also include a prompt_template string that will be used with Python str.format(**args). The template must reference the arg_names (e.g., "{object}", "{property}") and should specify the expected response format clearly.
+7) For Symbolic functions: also include an implementation string. This is a Python function body (may be multi-line) that assumes the arg_names are already in scope. If you provide a single expression, it should be written as "return <expr>".
+8) After proposing, run a self-check: remove or revise anything that conflicts with examples or types.
+9) Output only valid JSON matching the schema provided below.
+
+Type system:
+<<TYPES>>
+
+Note: Type img is an actual image (path to image), the other types are represented as strings.
+
+Given functions (existing DSL):
+<<FUNCTIONS>>
+
+Example programs:
+<<EXAMPLES>>
+
+Output schema (JSON):
+{
+  "types_added": [ { "name": string, "definition": string } ],
+  "functions_added": [
+    {
+      "name": string,
+      "kind": "Symbolic" | "VLM",
+      "signature": string,
+      "arg_names": [string],
+      "semantics": string,
+      "examples": [ { "input": string, "output": string } ],
+      "preconditions": [string],
+      "failure_modes": [string],
+      "prompt_template": string,
+      "implementation": string
+    }
+  ],
+  "example_programs": [ string ],
+  "rejected_ideas": [ { "idea": string, "reason": string } ]
+}
+
+Design requirements:
+- Add 12-20 functions total.
+- At least 1 VLM function with IMG in the signature.
+- Prefer small orthogonal primitives that compose well.
+- Include at least 5 functions that help transform VLM outputs (filtering, grouping, spatial relations, querying).
+- Avoid overly specific one-off functions.
+- Use concise, consistent function and argument names.
+
+Now produce the JSON.

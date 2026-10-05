@@ -1,0 +1,44 @@
+## Task
+Identify objects and their properties from the image,
+
+## Rules
+1. Identify relevant objects and their properties
+2. Return empty list if there are no objects in the image
+3. No explanations or additional text
+
+## Output Format
+```python
+objects = [
+    ['object_name', 'property1', 'property2', ...],
+    ['object_name', 'property1'],
+    ...
+]
+```
+
+**If no objects:** `objects = [[]]`
+
+## Examples
+
+**Example 1**
+- Image: Red car under tall tree with small standing person
+
+```python
+objects = [
+    ['car', 'red'],
+    ['tree', 'tall'], 
+    ['person', 'standing', 'small']
+]
+```
+
+**Example 2**
+- Image: Dog sitting by round ball and blue chair
+
+```python
+objects = [
+    ['dog', 'sitting'],
+    ['ball', 'round'],
+    ['chair', 'blue']
+]
+```
+
+**Analyze the image now:**

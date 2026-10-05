@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="description"
+        content="ZendoWorld: an interactive benchmark for grounded active visual concept induction.">
+    <meta name="keywords"
+        content="ZendoWorld, visual reasoning, concept induction, active experimentation, VLM, program synthesis">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Playing ZendoWorld</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+    <style>
+        body {
+            font-family: 'Noto Sans', sans-serif;
+        }
+
+        .publication-title {
+            font-family: 'Google Sans', sans-serif;
+        }
+
+        .publication-authors {
+            margin-top: 0.5rem;
+        }
+
+        .publication-authors .author-block {
+            margin-right: 0.5rem;
+        }
+
+        .publication-links {
+            margin-top: 1.5rem;
+        }
+
+        .publication-links .link-block {
+            margin: 0.25rem;
+        }
+
+        .motivation-image {
+            max-width: 55%;
+            height: auto;
+        }
+
+        .figure-image {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .figure-image.narrow {
+            max-width: 80%;
+        }
+
+        .frontend-grid img {
+            width: 32%;
+            height: auto;
+            margin: 0 0.4%;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+
+        .demo-iframe-wrap {
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .demo-iframe-wrap iframe {
+            display: block;
+            width: 100%;
+            height: 1400px;
+            border: 0;
+        }
+
+        .demo-note {
+            font-size: 0.9rem;
+            color: #718096;
+            font-style: italic;
+            margin-top: 0.75rem;
+        }
+
+        pre {
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <section class="hero">
+        <div class="hero-body">
+            <div class="container is-max-desktop">
+                <div class="columns is-centered">
+                    <div class="column has-text-centered">
+                        <h1 class="title is-1 publication-title">
+                            Playing ZendoWorld: Challenging AI Agents on Active Visual Concept Induction
+                        </h1>
+
+                        <div class="is-size-5 publication-authors">
+                            <span class="author-block">Sophia Koehler<sup>1,2</sup>,</span>
+                            <span class="author-block">Antonia W&uuml;st<sup>1</sup>,</span>
+                            <span class="author-block">Inga Ibs<sup>3,4</sup>,</span>
+                            <span class="author-block">Wasu Top Piriyakulkij<sup>5</sup>,</span>
+                            <span class="author-block">Wolfgang Stammer<sup>6</sup>,</span>
+                            <span class="author-block">Constantin Rothkopf<sup>2,3,4</sup>,</span>
+                            <span class="author-block">Kevin Ellis<sup>5</sup>,</span>
+                            <span class="author-block">Kristian Kersting<sup>1,2,4,7</sup></span>
+                        </div>
+
+                        <div class="is-size-6 publication-authors">
+                            <span class="author-block"><sup>1</sup>AIML Lab, TU Darmstadt,</span>
+                            <span class="author-block"><sup>2</sup>Hessian Center for AI (hessian.AI),</span>
+                            <span class="author-block"><sup>3</sup>Psychology of Information Processing, TU
+                                Darmstadt,</span>
+                            <span class="author-block"><sup>4</sup>Centre for Cognitive Science, TU Darmstadt,</span>
+                            <span class="author-block"><sup>5</sup>Cornell University,</span>
+                            <span class="author-block"><sup>6</sup>Max Planck Institute for Informatics, SIC,</span>
+                            <span class="author-block"><sup>7</sup>German Center for AI (DFKI)</span>
+                        </div>
+
+                        <div class="column has-text-centered">
+                            <div class="publication-links">
+                                <span class="link-block">
+                                    <a href="https://arxiv.org/abs/2607.08233"
+                                        class="external-link button is-normal is-rounded is-dark" target="_blank">
+                                        <span class="icon"><i class="ai ai-arxiv"></i></span>
+                                        <span>arXiv</span>
+                                    </a>
+                                </span>
+                                <span class="link-block">
+                                    <a href="https://arxiv.org/pdf/2607.08233"
+                                        class="external-link button is-normal is-rounded is-dark" target="_blank">
+                                        <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                                        <span>Paper</span>
+                                    </a>
+                                </span>
+                                <span class="link-block">
+                                    <a href="https://github.com/ml-research/ZendoWorld"
+                                        class="external-link button is-normal is-rounded is-dark" target="_blank">
+                                        <span class="icon"><i class="fab fa-github"></i></span>
+                                        <span>Code</span>
+                                    </a>
+                                </span>
+                                <span class="link-block">
+                                    <a href="https://huggingface.co/datasets/ss567uhg/zendo-synthetic-data"
+                                        class="external-link button is-normal is-rounded is-dark" target="_blank">
+                                        <span class="icon">&#129303;</span>
+                                        <span>Dataset</span>
+                                    </a>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="hero teaser">
+        <div class="hero-body">
+            <div class="container is-max-desktop">
+                <div class="content has-text-centered">
+                    <img src="./static/images/motivation.png" class="motivation-image"
+                        alt="ZendoWorld combines perception, induction, and experimentation." />
+
+                    <h3 class="subtitle has-text-centered">
+                        <strong>ZendoWorld</strong> is a controlled interactive environment in which agents must infer a
+                        hidden logical rule about visual scenes by proposing new experiments and refining hypotheses
+                        from feedback, jointly exercising <em>perception</em>, <em>induction</em>, and
+                        <em>active experimentation</em>.
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="hero is-light is-small">
+        <div class="hero-body">
+            <div class="container is-max-desktop">
+                <div class="columns is-centered has-text-centered">
+                    <div class="column is-four-fifths">
+                        <h2 class="title is-3">Abstract</h2>
+                        <div class="content has-text-justified">
+                            <p>
+                                A central challenge in building intelligent systems is enabling agents to jointly
+                                perceive complex inputs, form hypotheses about hidden patterns, and design informative
+                                experiments to test them. To study this problem, we propose <strong>ZendoWorld</strong>,
+                                a controlled interactive environment in which agents must infer a logical rule about
+                                visual game observations, acquire information by proposing new scenes, and refine their
+                                hypotheses based on feedback from the game environment. We evaluate several agents
+                                spanning pure VLM reasoning, Bayesian particle filtering, dynamic concept discovery, and
+                                neuro-symbolic methods. Our main findings are: (1) high accuracy in predicting labels
+                                for observed examples does not imply recovery of the underlying rule; (2) perception
+                                and induction are distinct bottlenecks for different agent classes; and (3) VLM-based
+                                agents propose near-uninformative experiments, failing to actively reduce hypothesis
+                                uncertainty. To compare these results, we collect human data on the task, which reveals
+                                a gap in inductive reasoning, particularly for more complex rules. Overall, ZendoWorld
+                                takes an important step toward evaluating intelligent agents and identifies concrete
+                                avenues for improvement, particularly in domains like scientific discovery.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="section">
+        <div class="container is-max-desktop">
+            <div class="columns is-centered">
+                <div class="column is-full-width">
+                    <h2 class="title is-3">The ZendoWorld Interaction Loop</h2>
+                    <div class="content has-text-justified">
+                        <p>
+                            Inspired by the inductive logic game <em>Zendo</em>, each episode centers on a hidden
+                            ground-truth rule expressed in a Prolog-based DSL. The agent is initialized with a positive
+                            and a negative seed scene, then alternates between two actions:
+                        </p>
+                        <ul>
+                            <li><strong>Experimentation.</strong> Propose a new 3D scene, predict whether it satisfies
+                                the hidden rule, and receive the ground-truth label.</li>
+                            <li><strong>Hypothesis induction.</strong> Once its own prediction matches the label, the
+                                agent may submit a candidate rule. If it is not logically equivalent to the true rule,
+                                a counterexample is returned and the loop continues.</li>
+                        </ul>
+                        <p>
+                            An episode ends when the agent guesses the rule or exhausts its budget of 30 examples.
+                            This design cleanly separates perception, induction, and experimentation as distinct
+                            contributors to success or failure.
+                        </p>
+                    </div>
+                    <div class="hero-body has-text-centered">
+                        <img src="./static/images/zendo_steps.png" class="figure-image"
+                            alt="Overview of the ZendoWorld interaction loop (Initialization, Experimentation, Hypothesis Induction)." />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="hero is-light is-small">
+        <div class="hero-body">
+            <div class="container is-max-desktop">
+                <div class="columns is-centered">
+                    <div class="column is-full-width">
+                        <h2 class="title is-3 has-text-centered">Scenes and Rule Space</h2>
+                        <div class="content has-text-justified">
+                            <p>
+                                Scenes are rendered with a procedural Blender&ndash;Prolog pipeline. Each scene contains
+                                one to seven colored geometric objects (blocks, wedges, pyramids) with symbolic
+                                attributes and spatial relations (<em>touching</em>, <em>stacked</em>,
+                                <em>pointing&nbsp;at</em>), yielding roughly 10<sup>18</sup> configurations. The
+                                rule space is organized into three difficulty tiers of increasing structural
+                                complexity:
+                            </p>
+                            <ul>
+                                <li><strong>First-Order</strong>: counting predicates over single attributes
+                                    (e.g. <em>exactly one blue upright piece</em>).</li>
+                                <li><strong>Second-Order</strong>: comparative or parity quantifiers
+                                    (e.g. <em>more red than blue pieces</em>).</li>
+                                <li><strong>Compositional</strong>: spatial relations and logical connectives
+                                    (e.g. <em>a pyramid touching an upright piece</em>).</li>
+                            </ul>
+                        </div>
+                        <div class="hero-body has-text-centered">
+                            <img src="./static/images/g1.png" class="figure-image"
+                                alt="Positive and negative scene examples for the rule 'odd number of pieces', with symbolic representation." />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="section">
+        <div class="container is-max-desktop">
+            <div class="columns is-centered">
+                <div class="column is-full-width">
+                    <h2 class="title is-3">Agents We Evaluate</h2>
+                    <div class="content has-text-justified">
+                        <p>
+                            We evaluate four visual rule-learning agents spanning neural, probabilistic, and
+                            neuro-symbolic approaches:
+                        </p>
+                        <ul>
+                            <li><strong>Oracle Agent</strong>: a neuro-symbolic upper bound with full DSL access
+                                and DeepSynth-style program synthesis, paired with heuristic experiment selection.</li>
+                            <li><strong>VLM Agent</strong>: an end-to-end vision-language baseline that induces
+                                rules and picks experiments implicitly through prompting.</li>
+                            <li><strong>Bayesian Agent</strong>: an LLM-SMC method that maintains a particle-based
+                                posterior over hypotheses and selects posterior-guided experiments.</li>
+                            <li><strong>Vision-Language Programs (VLP) Agent</strong>: combines VLM-based concept
+                                extraction with program search over a general DSL, learning symbolic attributes from
+                                visual input.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="hero is-light is-small">
+        <div class="hero-body">
+            <div class="container is-max-desktop">
+                <div class="columns is-centered">
+                    <div class="column is-full-width">
+                        <h2 class="title is-3 has-text-centered">Results: Humans Still Outperform AI Agents</h2>
+                        <div class="content has-text-justified">
+                            <p>
+                                Across 22 evaluation games, no learned agent approaches the neuro-symbolic Oracle,
+                                and all fall well below human participants. The pure VLM Agent is the strongest of the
+                                learned baselines (44.5% wins), but methods designed to add structure (Bayesian
+                                (13.6%) and VLP (18.2%)) do not close the gap. Humans solve at least 50% of
+                                games across every complexity class, whereas VLM-based agents degrade sharply from
+                                first-order to compositional rules.
+                            </p>
+                        </div>
+                        <div class="hero-body has-text-centered">
+                            <img src="./static/images/win_rate_gap_vs_human.png" class="figure-image narrow"
+                                alt="Win rate per complexity class for humans and AI agents." />
+                        </div>
+                        <div class="content has-text-justified">
+                            <p>
+                                Ablating visual input by feeding agents symbolic Prolog-style scene descriptions
+                                improves every learned agent (the VLP Agent gains over 160%), confirming that
+                                <strong>perception is a key bottleneck</strong>. Yet even in the symbolic setting no
+                                agent matches the Oracle, showing that <strong>induction is a second, independent
+                                bottleneck</strong>. Finally, an expected-information-gain analysis reveals that
+                                VLM-based agents produce experiments similar to prior observations, adding little new
+                                information. This highlights a concrete deficit in active hypothesis testing.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="section">
+        <div class="container is-max-desktop">
+            <div class="columns is-centered">
+                <div class="column is-full-width">
+                    <h2 class="title is-3">Human Study</h2>
+                    <div class="content has-text-justified">
+                        <p>
+                            To place agent performance in the context of human capability, we collected behavioral
+                            data from 19 participants playing through a browser-based implementation of ZendoWorld
+                            deployed on a JATOS server. Participants completed an interactive tutorial and then played
+                            one to six games under the same interaction protocol as the agents.
+                        </p>
+                    </div>
+                    <div class="frontend-grid has-text-centered">
+                        <img src="./static/images/frontend_label.png" alt="Frontend: labeling a scene." />
+                        <img src="./static/images/frontend_experiment.png"
+                            alt="Frontend: proposing an experimental scene." />
+                        <img src="./static/images/frontend_guess.png" alt="Frontend: guessing the rule." />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="section" id="demo">
+        <div class="container is-max-desktop">
+            <div class="columns is-centered">
+                <div class="column is-full-width">
+                    <h2 class="title is-3">Try It Yourself</h2>
+                    <div class="content has-text-justified">
+                        <p>
+                            This is a demo of the actual human study, simplified for illustration. The full study uses a
+                        Prolog rule engine, Blender-rendered scenes, and multi-turn play against a live backend.
+                        </p>
+                    </div>
+                    <div class="demo-iframe-wrap">
+                        <iframe src="./demo/index.html" title="ZendoWorld one-turn demo"
+                            loading="lazy"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="section" id="BibTeX">
+        <div class="container is-max-desktop content">
+            <h2 class="title">BibTeX</h2>
+            <pre><code>@article{koehler2026playing,
+    title   = {Playing ZendoWorld: Challenging AI Agents on Active Visual Concept Induction},
+    author  = {Koehler, Sophia and W{\"u}st, Antonia and Ibs, Inga and Piriyakulkij, Wasu Top
+               and Stammer, Wolfgang and Rothkopf, Constantin and Ellis, Kevin and Kersting, Kristian},
+    journal = {arXiv preprint arXiv:2607.08233},
+    year    = {2026}
+}</code></pre>
+        </div>
+    </section>
+
+
+    <footer class="footer">
+        <div class="container">
+            <div class="content has-text-centered">
+                <a class="icon-link" href="https://arxiv.org/pdf/2607.08233" target="_blank">
+                    <i class="fas fa-file-pdf"></i>
+                </a>
+                <a class="icon-link" href="https://github.com/ml-research/ZendoWorld" target="_blank">
+                    <i class="fab fa-github"></i>
+                </a>
+            </div>
+            <div class="columns is-centered">
+                <div class="column is-8">
+                    <div class="content">
+                        <h4 class="title is-5 has-text-centered">Acknowledgments</h4>
+                        <p>
+                            This project was partially funded by the Deutsche Forschungsgemeinschaft (DFG, German
+                            Research Foundation) under Germany&rsquo;s Excellence Strategy (EXC-3057/1 &bdquo;Reasonable
+                            Artificial Intelligence&ldquo;, Project No.&nbsp;533677015). This work was further supported
+                            by the Priority Program (SPP) 2422 in the subproject &ldquo;Optimization of active surface
+                            design of high-speed progressive tools using machine and deep learning algorithms&ldquo;
+                            funded by the German Research Foundation (DFG). It has also benefited from the Cluster of
+                            Excellence &ldquo;The Adaptive Mind&rdquo;, funded by the DFG under Germany&rsquo;s
+                            Excellence Strategy &mdash; EXC-3066.
+                        </p>
+                        <p class="has-text-centered">
+                            Website template adapted from
+                            <a href="https://github.com/nerfies/nerfies.github.io">nerfies.github.io</a>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>

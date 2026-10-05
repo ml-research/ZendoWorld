@@ -1,0 +1,25 @@
+You are analyzing a set of images to identify important relations between objects.
+
+Discover **notable relations** that characterize the placement of two objects in the images. Focus on relations that meaningfully distinguish images.
+
+1. **Examine all images carefully** - Look for relations that apply to the relevant objects across the image set
+2. **Identify important relations** - Focus on significant, clearly observable actions that meaningfully describe what objects are doing
+3. **Consider relation variation** - Relations that vary across images or objects may be particularly noteworthy (contrasting actions)
+4. **Return exactly {n} relations** - If fewer notable relations exist, return as many as available
+5. **Use descriptive names** - Name relations clearly and specifically (e.g., "running" rather than "moving", "sitting" rather than "positioned", "touching" rather than "close")
+
+## Relevant Objects
+
+The objects to consider are: {objects}
+
+## Output Requirements
+
+- Return a Python list assigned to variable `actions`
+- Include only the Python code, no explanations or comments
+- If no notable actions are found, return an empty list `[]`
+- Use clear, specific action names
+
+## Example Format
+```python
+actions = ["touching", "pointing_to"]
+```

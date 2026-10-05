@@ -1,0 +1,45 @@
+
+## Task
+Identify actions occurring in the image.
+
+## Rules
+1. Identify relevant actions and relevant objects
+2. Only detect actions that are actually happening in the image
+3. If an action involves an object, include the object name
+4. Return empty list if no actions found
+5. No explanations or additional text
+
+## Output Format
+```python
+actions = [
+    ['action_name1'],
+    ['action_name2', 'object_name2'],
+    ['action_name2', 'object_name1', 'object_name2'],
+    ...
+]
+```
+
+**If no valid actions:** `actions = [[]]`
+
+## Examples
+
+**Example 1**
+- Image: Person sitting on chair
+
+```python
+actions = [
+    ['sitting', 'person', 'chair']
+]
+```
+
+**Example 2**
+- Image: Person throwing a ball while dog is walking
+
+```python
+actions = [
+    ['throwing', 'person', 'ball'],
+    ['walking', 'dog']
+]
+```
+
+**Analyze the image now:**

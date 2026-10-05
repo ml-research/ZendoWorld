@@ -1,0 +1,16 @@
+You are provided with a number of images. Your goal is to identify the objects in the images. There are questions like:
+Does the image contain a '{object}'? Answer with 'YES' or 'NO'.
+How many objects in the image are '{object}'? Answer with 'NUMBER: X', where X is the number.
+Your task is to provide a list of objects that are present in the images.
+Specifically consider objects that appear in some of the images and not in others, i.e., contrasting objects.
+The objects should be provided in the form of a list of strings.
+For example, if the objects are 'person' and 'dog', your answer should be ['person', 'dog'].
+If there are no objects, return an empty list []. 
+Come up with exactly {n} objects.
+
+Answer format:
+```python
+objects = [...]
+```
+Do not use any python comments.
+Please provide the objects for the images provided.

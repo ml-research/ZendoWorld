@@ -1,0 +1,62 @@
+# Task: Concept Identification from Structured Image Representations
+
+You will be given a sequence of structured image representations, where each image is labeled as either a **positive** or **negative** example of an underlying concept.
+
+## Structure of Each Image Representation
+
+### Objects
+A list of objects, where each object is described together with its properties.
+
+**Format:**
+```
+[[object_name, property1, property2, ...], [object_name, property1, ...], ...]
+```
+
+**Example:**
+```
+[[dog, brown, large], [cat, small, cute], [ball, red, round]]
+```
+
+### Actions
+A list of actions occurring in the image, including the entities involved.
+
+**Format:**
+```
+[[action, participant1, participant2, ...], [action, participant], ...]
+```
+
+**Example:**
+```
+[[playing, dog, cat], [shining, sun], [rolling, ball]]
+```
+
+## Your Objective
+
+Identify the rule that defines the positive examples:
+- The rule must apply to all positive examples.
+- The rule must not apply to any negative example.
+
+## Step-by-Step Process
+
+1. Image Analysis:
+- Analyze the objects, their properties, and the actions across all examples to identify the concept that distinguishes positive examples from negative ones.
+
+2. Rule Derivation:
+- From your analysis, infer the rule that uniquely characterizes the positive examples.
+- Confirm that the rule does not hold for the negative examples.
+
+## Structured Image Representations
+
+{representations}
+
+## Final Answer Format
+
+Provide your final answer in the following format:
+
+```python
+answer = {
+'rule': '[RULE]',
+}
+```
+
+Ensure that the rule is clearly defined and concise.

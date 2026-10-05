@@ -1,0 +1,38 @@
+# Task: Classify Image based on Structured Image Representations
+
+You are given a structured image representation.
+
+## Structure of Each Image Representation
+
+### Objects
+A list of objects, where each object is described together with its properties.
+
+**Format:**
+```
+[[object_name, property1, property2, ...], [object_name, property1, ...], ...]
+```
+
+**Example:**
+```
+[[dog, brown, large], [cat, small, cute], [ball, red, round]]
+```
+
+### Actions
+A list of actions occurring in the image, including the entities involved.
+
+**Format:**
+```
+[[action, participant1, participant2, ...], [action, participant], ...]
+```
+
+**Example:**
+```
+[[playing, dog, cat], [shining, sun], [rolling, ball]]
+```
+
+## Your Objective
+Given the rule '{rule}', determine if the image follows the rule or not. Answer with 'Yes' or 'No', nothing else.
+
+## Structured Image Representations
+
+{representation}

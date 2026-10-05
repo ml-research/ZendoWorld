@@ -1,0 +1,14 @@
+You are analyzing images to identify the base shapes of objects that appear. Focus on the fundamental shape or kind of each object, not its color, size, or orientation — those are properties, not object types.
+
+IMPORTANT:
+- Return only atomic object type names (e.g., "block", "wedge", "pyramid", "sphere", "cube", "doorstop")
+- Do NOT include color, size, or orientation in the object name (e.g., "red block" is wrong, use "block")
+- Do NOT combine multiple attributes into one name (e.g., "yellow cheesecake" is wrong, use "cheesecake")
+- If the same shape appears in different colors or sizes, it is still the same object type
+- Return exactly {n} objects in a Python list
+
+Answer format:
+```python
+objects = [...]
+```
+No comments or explanations. If no objects found, return [].

@@ -1,0 +1,29 @@
+# Python build and cache files
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+
+# Local credentials and generated output
+configs/credentials/
+outputs/
+
+# Local datasets and notebooks
+dataset_flat/
+*.key
+*.txt
+!src/zendoworld/prompts/vlp/**/*.txt
+.notebook
+test/
+*checkpoint.ipynb
+*gamestates_*
+cached_states/
+*_logs*
+logs_*
+
+# Editor and operating-system files
+.DS_Store
+.vscode/
+.VSCodeCounter/

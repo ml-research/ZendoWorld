@@ -1,0 +1,1000 @@
+Here is a python file that describes a DSL:
+
+```
+import re
+from method.type_system import *
+from method.program import *
+
+import torch
+import math
+import ast
+from functools import reduce
+
+t0 = PolymorphicType("t0")
+t1 = PolymorphicType("t1")
+
+
+def parse_bool(response):
+    response = response.strip().upper()
+    if "YES" in response:
+        return True
+    elif "NO" in response:
+        return False
+    elif "ONCE" in response:
+        return True
+    else:
+        print("!! Invalid response from model. Expected 'YES' or 'NO'.")
+        return False
+
+
+def parse_incomplete_list(raw):
+    """Parses an incomplete list like
+    objects = [['car', 'red'], ['tree', 'tall'], ['person', 'standing', 'small'],
+    """
+    lines = raw.strip().splitlines()
+    parsed_objects = []
+
+    for line in lines:
+        line = line.strip()
+        if line.startswith("objects"):
+            continue  # skip the assignment line
+        if line.startswith("["):
+            try:
+                # Try parsing line as a literal list
+                parsed = ast.literal_eval(line.rstrip(","))
+                if isinstance(parsed, list):
+                    parsed_objects.append(parsed)
+            except (SyntaxError, ValueError):
+                # Reached the cutoff or malformed line
+                break
+
+    return parsed_objects
+
+
+def parse_incomplete_flat_list(raw):
+    """Parses an incomplete flat list like
+    objects = ['car', 'red', 'tree', 'tall', 'person', 'standing', 'small']
+    """
+    list_pattern = re.compile(r"\[.*?\]")  # non-greedy match for each complete [...]
+    matches = list_pattern.findall(raw)
+    parsed_objects = []
+
+    for match in matches:
+        try:
+            parsed = ast.literal_eval(match)
+            if isinstance(parsed, list):
+                parsed_objects.append(parsed)
+        except (SyntaxError, ValueError):
+            continue  # skip malformed sublists
+
+    return parsed_objects
+
+
+def get_dsl(model, dataset, prompter, variables):
+
+    objects = variables.get("objects", [])
+    properties = variables.get("properties", [])
+    actions = variables.get("actions", [])
+    sceneries = variables.get("sceneries", [])
+
+    with torch.no_grad():
+        torch.cuda.empty_cache()
+
+    def _flatten(l):
+        return [x for xs in l for x in xs]
+
+    def _if(c):
+        return lambda t: lambda f: t if c else f
+
+    def _and(x):
+        return lambda y: x and y
+
+    def _or(x):
+        return lambda y: x or y
+
+    def _addition(x):
+        return lambda y: x + y
+
+    def _subtraction(x):
+        return lambda y: x - y
+
+    def _multiplication(x):
+        return lambda y: x * y
+
+    def _negate(x):
+        return -x
+
+    def _reverse(x):
+        return list(reversed(x))
+
+    def _append(x):
+        return lambda y: x + y
+
+    def _cons(x):
+        return lambda y: [x] + y
+
+    def _car(x):
+        return x[0]
+
+    def _cdr(x):
+        return x[1:]
+
+    def _isEmpty(x):
+        return x == []
+
+    def _single(x):
+        return [x]
+
+    def _slice(x):
+        return lambda y: lambda l: l[x:y]
+
+    def _map(f):
+        return lambda l: list(map(f, l))
+
+    def _zip(a):
+        return lambda b: lambda f: list(map(lambda x, y: f(x)(y), a, b))
+
+    def _mapi(f):
+        return lambda l: list(map(lambda i_x: f(i_x[0])(i_x[1]), enumerate(l)))
+
+    def _reduce(f):
+        return lambda x0: lambda l: reduce(lambda a, x: f(a)(x), l, x0)
+
+    def _reducei(f):
+        return lambda x0: lambda l: reduce(
+            lambda a, t: f(t[0])(a)(t[1]), enumerate(l), x0
+        )
+
+    def _fold(l):
+        return lambda x0: lambda f: reduce(lambda a, x: f(x)(a), l[::-1], x0)
+
+    def _eq(x):
+        return lambda y: x == y
+
+    def _eq0(x):
+        return x == 0
+
+    def _a1(x):
+        return x + 1
+
+    def _d1(x):
+        return x - 1
+
+    def _mod(x):
+        return lambda y: y % x if x != 0 else None
+
+    def _not(x):
+        return not x
+
+    def _gt(x):
+        return lambda y: x > y
+
+    def _index(j):
+        return lambda l: l[j]
+
+    def _replace(f):
+        return lambda lnew: lambda lin: _flatten(
+            lnew if f(i)(x) else [x] for i, x in enumerate(lin)
+        )
+
+    def _isSquare(n):
+        return int(math.sqrt(n)) ** 2 == n
+
+    def _appendmap(f):
+        lambda xs: [y for x in xs for y in f(x)]
+
+    def _filter(f):
+        return lambda l: list(filter(f, l))
+
+    def _any(f):
+        return lambda l: any(f(x) for x in l)
+
+    def _all(f):
+        return lambda l: all(f(x) for x in l)
+
+    def _find(x):
+        def _inner(l):
+            try:
+                return l.index(x)
+            except ValueError:
+                return -1
+
+        return _inner
+
+    def _unfold(x):
+        return lambda p: lambda f: lambda n: __unfold(p, f, n, x)
+
+    def __unfold(p, f, n, x, recursion_limit=20):
+        if recursion_limit <= 0:
+            raise ValueError
+        if p(x):
+            return []
+        return [f(x)] + __unfold(p, f, n, n(x), recursion_limit - 1)
+
+    def _count_objects_with_property(img_representation):
+        return lambda property: __count_objects_with_property(
+            img_representation, property
+        )
+
+    def __count_objects_with_property(img_representation, property):
+        count = 0
+        for obj in img_representation:
+            if isinstance(obj, list) and len(obj) > 1 and property in obj[1:]:
+                count += 1
+        return count
+
+    def _count_objects_with_properties(img_representation):
+        return lambda property1: lambda property2: __count_objects_with_properties(
+            img_representation, property1, property2
+        )
+
+    def __count_objects_with_properties(img_representation, property1, property2):
+        count = 0
+        for obj in img_representation:
+            if (
+                isinstance(obj, list)
+                and len(obj) > 1
+                and property1 in obj[1:]
+                and property2 in obj[1:]
+            ):
+                count += 1
+        return count
+
+    def _all_objects_have_property(img_representation):
+        return lambda property: __all_objects_have_property(
+            img_representation, property
+        )
+
+    def __all_objects_have_property(img_representation, property):
+        for obj in img_representation:
+            if property not in obj[1:]:
+                return False
+        return True
+
+    def _objects_from_img(img):
+        """
+        Obtain a list of objects and their properties from the image.
+        The objects are represented as a list of lists, where each inner list contains the object name
+        followed by its properties.
+        """
+
+        return __obtain_objects_from_img(img, objects, properties)
+
+    def __obtain_objects_from_img(img, objects, properties):
+
+        prompt = f"""
+        ## Task
+        Identify objects and their properties from the image using only the provided lists.
+
+        **Objects:** {objects}  
+        **Properties:** {properties}
+
+        ## Rules
+        1. Only use objects/properties from the provided lists
+        2. Return empty list if no valid objects found
+        3. No explanations or additional text
+
+        ## Output Format
+        ```python
+        objects = [
+            ['object_name', 'property1', 'property2', ...],
+            ['object_name', 'property1'],
+            ...
+        ]
+        ```
+
+        **If no valid objects:** `objects = [[]]`
+
+        ## Examples
+
+        **Example 1**
+        - Objects: ["car", "person", "tree"]
+        - Properties: ["red", "tall", "small", "standing"]
+        - Image: Red car under tall tree with small standing person
+
+        ```python
+        objects = [
+            ['car', 'red'],
+            ['tree', 'tall'], 
+            ['person', 'standing', 'small']
+        ]
+        ```
+
+        **Example 2**
+        - Objects: ["dog", "ball", "book", "chair"] 
+        - Properties: ["blue", "sitting", "round"]
+        - Image: Dog sitting by round ball and blue chair
+
+        ```python
+        objects = [
+            ['dog', 'sitting'],
+            ['ball', 'round'],
+            ['chair', 'blue']
+        ]
+        ```
+
+        **Example 3**
+        - Objects: ["bicycle", "lamp", "table", "cup"]
+        - Properties: ["green", "broken", "wooden", "white"]
+        - Image: Table with laptop and cup
+
+        ```python
+        objects = [[]]
+        ```
+        *Note: Even though 'table' and 'cup' are in the objects list and visible in the image, neither has properties from the provided list, so no valid object-property combinations exist*
+
+        **Analyze the image now:**
+        """
+
+        if ablate_symbols:
+            prompt_path = "prompts/vlm_functions/get_object_property_repr.txt"
+            with open(prompt_path, "r") as f:
+                prompt = f.read()
+                # print("Using no symbol grounding prompt: ", not "**Objects:**" in prompt)
+        
+        response = prompter.prompt_with_images(
+            prompt_text=prompt, paths=[img], max_new_tokens=200
+        )
+        org_response = response
+        # print(response)
+        # Parse the response to extract the objects and their properties
+        try:
+            # remove \n from response
+            identifier = "objects =" if "objects =" in response else "object ="
+            response = response.replace("\n", "")
+            response = response.split(identifier)[-1]
+            response = response.split("```")[0]
+            object_list = ast.literal_eval(response)
+
+        except Exception as e:
+            # raise ValueError(f"Failed to parse the response: {e}")
+            # print(f"Failed to parse the response: {org_response} - {e}")
+            try:
+                object_list_1 = parse_incomplete_list(response)
+                object_list_2 = parse_incomplete_flat_list(response)
+
+                # select the longest list
+                if len(object_list_1) >= len(object_list_2):
+                    # print("Successfully parsed object list 1.")
+                    object_list = object_list_1
+                else:
+                    # print("Successfully parsed object list 2.")
+                    object_list = object_list_2
+
+                # print(object_list)
+
+            except Exception as e2:
+                try:
+                    object_list = parse_incomplete_flat_list(response)
+                except Exception as e3:
+                    # If all parsing attempts fail, return an empty list
+                    print(f"Failed to parse the response: {org_response} - {e3}")
+                    object_list = [[]]
+
+        if type(object_list) == list and len(object_list) > 0:
+            if type(object_list[0]) == str:
+                print(f"Turning action list {object_list} into a nested list.")
+                object_list = [object_list]
+                print(object_list)
+
+        if type(object_list) != list:
+            object_list = [[]]
+        elif len(object_list) > 0 and type(object_list[0]) != list:
+            object_list = [[]]
+
+        return object_list
+    
+    def _objects_from_img_no_symbols(img):
+        """
+        Obtain a list of objects and their properties from the image.
+        The objects are represented as a list of lists, where each inner list contains the object name
+        followed by its properties.
+        """
+
+        return __obtain_objects_from_img_no_symbols(img)
+    
+    def __obtain_objects_from_img_no_symbols(img):
+
+        prompt_path = "prompts/vlm_functions/get_object_property_repr.txt"
+        # read string from txt file
+        with open(prompt_path, "r") as f:
+            prompt = f.read()
+
+        response = prompter.prompt_with_images(
+            prompt_text=prompt, paths=[img], max_new_tokens=200
+        )
+        org_response = response
+        # print(response)
+        # Parse the response to extract the objects and their properties
+        try:
+            # remove \n from response
+            identifier = "objects =" if "objects =" in response else "object ="
+            response = response.replace("\n", "")
+            response = response.split(identifier)[-1]
+            response = response.split("```")[0]
+            object_list = ast.literal_eval(response)
+
+        except Exception as e:
+            # raise ValueError(f"Failed to parse the response: {e}")
+            # print(f"Failed to parse the response: {org_response} - {e}")
+            try:
+                object_list_1 = parse_incomplete_list(response)
+                object_list_2 = parse_incomplete_flat_list(response)
+
+                # select the longest list
+                if len(object_list_1) >= len(object_list_2):
+                    # print("Successfully parsed object list 1.")
+                    object_list = object_list_1
+                else:
+                    # print("Successfully parsed object list 2.")
+                    object_list = object_list_2
+
+                # print(object_list)
+
+            except Exception as e2:
+                try:
+                    object_list = parse_incomplete_flat_list(response)
+                except Exception as e3:
+                    # If all parsing attempts fail, return an empty list
+                    print(f"Failed to parse the response: {org_response} - {e3}")
+                    object_list = [[]]
+
+        if type(object_list) == list and len(object_list) > 0:
+            if type(object_list[0]) == str:
+                print(f"Turning action list {object_list} into a nested list.")
+                object_list = [object_list]
+                print(object_list)
+
+        if type(object_list) != list:
+            object_list = [[]]
+        elif len(object_list) > 0 and type(object_list[0]) != list:
+            object_list = [[]]
+
+        return object_list
+
+
+    def _exists_object_in_img(img_representation):
+        return lambda obj: __exists_object_in_img(img_representation, obj)
+
+    def __exists_object_in_img(object_representation, obj):
+        """
+        Check if the object is present in the image based on its representation.
+        The object representation is a list of strings, where the first element is the object name,
+        and the rest are its properties.
+        """
+
+        # print(
+        #     f"Checking if object '{obj}' is present in the image representation {object_representation}."
+        # )
+
+        if isinstance(object_representation, list):
+            for obj_repr in object_representation:
+                if isinstance(obj_repr, list) and len(obj_repr) > 0:
+                    if obj_repr[0] == obj:
+                        return True
+        else:
+            print("Invalid object representation format.")
+            return False
+
+        return False
+
+    def _count_object_in_img(img_representation):
+        return lambda obj: __count_object_in_img(img_representation, obj)
+
+    def __count_object_in_img(object_representation, obj):
+        """
+        Count how many times the object is present in the image based on its representation.
+        The object representation is a list of strings, where the first element is the object name,
+        and the rest are its properties.
+        """
+        if isinstance(object_representation, list):
+            count = 0
+            for obj_repr in object_representation:
+                if (
+                    isinstance(obj_repr, list)
+                    and len(obj_repr) > 0
+                    and obj_repr[0] == obj
+                ):
+                    count += 1
+            return count
+        else:
+            print("representation not a list")
+            return 0
+
+    def _exists_object_with_property(object_representation):
+        return lambda obj: lambda prop: __exists_object_with_property(
+            object_representation, obj, prop
+        )
+
+    def _exists_object_with_property_xil(object_representation):
+        return lambda obj: lambda prop: __exists_object_with_property(
+            object_representation, obj, prop, no_metal_spheres=True
+        )
+
+    def __exists_object_with_property(
+        object_representation, obj, prop, no_metal_spheres=False
+    ):
+        """
+        Check if the object with the given property is present in the image based on its representation.
+        The object representation is a list of strings, where the first element is the object name,
+        and the rest are its properties.
+        """
+
+        if no_metal_spheres:
+            if obj in ["sphere", "ball", "egg"] and prop in [
+                "metal",
+                "metallic",
+                "shiny",
+            ]:
+                return False
+        if isinstance(object_representation, list):
+            for obj_repr in object_representation:
+                if (
+                    isinstance(obj_repr, list)
+                    and len(obj_repr) > 1
+                    and obj_repr[0] == obj
+                ):
+                    if prop in obj_repr[1:]:
+                        return True
+
+        return False
+
+    def _exists_object_with_properties(object_representation):
+        return lambda obj: lambda prop1: lambda prop2: __exists_object_with_properties(
+            object_representation, obj, prop1, prop2
+        )
+
+    def __exists_object_with_properties(object_representation, obj, prop1, prop2):
+        """
+        Check if the object with the given properties is present in the image based on its representation.
+        The object representation is a list of strings, where the first element is the object name,
+        and the rest are its properties.
+        """
+
+        # prop1 and prop2 cannot be the same
+        if prop1 == prop2:
+            return False
+        if isinstance(object_representation, list):
+            for obj_repr in object_representation:
+                if isinstance(obj_repr, list) and len(obj_repr) > 1:
+                    if obj_repr[0] == obj:
+                        if prop1 in obj_repr[1:] and prop2 in obj_repr[1:]:
+                            return True
+
+        return False
+
+    def _exists_property(object_representation):
+        return lambda prop: __exists_property(object_representation, prop)
+
+    def __exists_property(object_representation, prop):
+        """
+        Check if the property is present in any object in the image based on its representation.
+        The object representation is a list of strings, where the first element is the object name,
+        and the rest are its properties.
+        """
+        if isinstance(object_representation, list):
+            for obj_repr in object_representation:
+                if isinstance(obj_repr, list) and len(obj_repr) > 1:
+                    if prop in obj_repr[1:]:
+                        return True
+
+        return False
+
+    def _exists_properties(object_representation):
+        return lambda prop1: lambda prop2: __exists_properties(
+            object_representation, prop1, prop2
+        )
+
+    def __exists_properties(object_representation, prop1, prop2):
+        """
+        Check if both properties are present in any object in the image based on its representation.
+        The object representation is a list of strings, where the first element is the object name,
+        and the rest are its properties.
+        """
+        if prop1 == prop2:
+            return False
+
+        if isinstance(object_representation, list):
+            for obj_repr in object_representation:
+                if (
+                    isinstance(obj_repr, list)
+                    and len(obj_repr) > 1
+                    and prop1 in obj_repr[1:]
+                    and prop2 in obj_repr[1:]
+                ):
+                    return True
+
+        return False
+
+    def _actions_from_img(img):
+        """
+        Obtain a list of actions from the image.
+        The actions are represented as a list of lists, where each inner list contains the action name
+        followed by its potential objects.
+        """
+
+        return __obtain_actions_from_img(img, objects)
+
+    def __obtain_actions_from_img(img, objects):
+
+        prompt = f"""
+        ## Task
+        Identify actions occurring in the image using only the provided lists.
+
+        **Actions:** {actions}  
+        **Objects:** {objects}
+
+        ## Rules
+        1. Only use actions/objects from the provided lists
+        2. Only detect actions that are actually happening in the image
+        3. Do not include actions from the list if they are not occurring in the image
+        4. If an action involves an object, include the object name
+        5. Return empty list if no valid actions found
+        6. No explanations or additional text
+
+        ## Output Format
+        ```python
+        actions = [
+            ['action_name1'],
+            ['action_name2', 'object_name2'],
+            ['action_name2', 'object_name1', 'object_name2'],
+            ...
+        ]
+        ```
+
+        **If no valid actions:** `actions = [[]]`
+
+        ## Examples
+
+        **Example 1**
+        - Actions: ["running", "jumping", "sitting", "dancing"]
+        - Objects: ["chair", "ball", "person", "table"]
+        - Image: Person sitting on chair
+
+        ```python
+        actions = [
+            ['sitting', 'person', 'chair']
+        ]
+        ```
+        *Note: 'running', 'jumping', and 'dancing' are in the actions list but not happening in the image, so they're excluded*
+
+        **Example 2**
+        - Actions: ["throwing", "catching", "walking", "reading", "sleeping"]
+        - Objects: ["ball", "book", "dog", "frisbee"]
+        - Image: Person throwing a ball while dog is walking
+
+        ```python
+        actions = [
+            ['throwing', 'person', 'ball'],
+            ['walking', 'dog']
+        ]
+        ```
+        *Note: 'catching', 'reading', and 'sleeping' are in the actions list but not occurring in the image, so they're excluded*
+
+        **Example 3**
+        - Actions: ["swimming", "flying", "cooking"]
+        - Objects: ["pool", "bird", "kitchen"]
+        - Image: Person eating at a restaurant
+
+        ```python
+        actions = [[]]
+        ```
+        *Note: Even though actions are happening in the image, none match the provided actions list, so no valid actions exist*
+
+        **Analyze the image now:**
+        """
+
+        if ablate_symbols:
+            prompt_path = "prompts/vlm_functions/get_action_object_repr.txt"
+            with open(prompt_path, "r") as f:
+                prompt = f.read()
+                print("Using no symbol grounding prompt: ", not "**Actions:**" in prompt)
+
+
+        response = prompter.prompt_with_images(
+            prompt_text=prompt, paths=[img], max_new_tokens=200
+        )
+        org_response = response
+        # print(response)
+        # Parse the response to extract the objects and their properties
+        try:
+            identifier = "actions =" if "actions =" in response else "action ="
+            # remove \n from response
+            response = response.replace("\n", "")
+            response = response.split(identifier)[-1]
+            response = response.split("```")[0]
+            action_list = ast.literal_eval(response)
+
+        except Exception as e:
+            # raise ValueError(f"Failed to parse the response: {e}")
+            print(f"Failed to parse the response: {org_response} - {e}")
+
+            try:
+                action_list_1 = parse_incomplete_list(response)
+                action_list_2 = parse_incomplete_flat_list(response)
+
+                # select the longest list
+                if len(action_list_1) >= len(action_list_2):
+                    print("Successfully parsed action list 1.")
+                    action_list = action_list_1
+                else:
+                    print("Successfully parsed action list 2.")
+                    action_list = action_list_2
+            except Exception as e2:
+                action_list = [[]]
+
+        if type(action_list) == list and len(action_list) > 0:
+            if type(action_list[0]) == str:
+                print(f"Turning action list {action_list} into a nested list.")
+                action_list = [action_list]
+                print(action_list)
+
+        return action_list
+    
+    def _actions_from_img_no_symbols(img):
+        """
+        Obtain a list of actions from the image.
+        The actions are represented as a list of lists, where each inner list contains the action name
+        followed by its potential objects.
+        """
+
+        return __obtain_actions_from_img(img)
+
+
+    def _exists_action_in_img(img_representation):
+        return lambda action: __exists_action_in_img(img_representation, action)
+
+    def __exists_action_in_img(action_representation, action):
+        """
+        Check if the action is present in the image based on its representation.
+        The action representation is a list of strings, where the first element is the action name,
+        and the rest are its properties.
+        """
+
+        if isinstance(action_representation, list):
+            for act_repr in action_representation:
+                if isinstance(act_repr, list) and len(act_repr) > 0:
+                    if act_repr[0] == action:
+                        # print(f"Action '{action}' found in the image representation.")
+                        return True
+        else:
+            return False
+
+        # print(f"Action '{action}' NOT found in the image representation.")
+
+        return False
+
+    def _count_all_objects(img_representation):
+        return len(img_representation) if isinstance(img_representation, list) else 0
+
+    def _max_objects_of_same_type(img_representation):
+        if not isinstance(img_representation, list):
+            return 0
+        type_counts = {}
+        for obj in img_representation:
+            if isinstance(obj, list) and len(obj) > 0:
+                obj_type = obj[0]
+                type_counts[obj_type] = type_counts.get(obj_type, 0) + 1
+        return max(type_counts.values()) if type_counts else 0
+
+    def _exists_action_with_object_in_img(img_representation):
+        return lambda action: lambda obj: __exists_action_with_object_in_img(
+            img_representation, action, obj
+        )
+
+    def __exists_action_with_object_in_img(action_representation, action, obj):
+        """
+        Check if the action with the given object is present in the image based on its representation.
+        The action representation is a list of strings, where the first element is the action name,
+        and the rest are its properties.
+        """
+
+        if isinstance(action_representation, list):
+            for act_repr in action_representation:
+                if (
+                    isinstance(act_repr, list)
+                    and len(act_repr) > 1
+                    and act_repr[0] == action
+                ):
+                    if obj in act_repr[1:]:
+                        return True
+
+        return False
+
+    def _exists_object_small_in_img(img_representation):
+        return lambda obj: __exists_object_small_in_img(img_representation, obj)
+
+    def __exists_object_small_in_img(img_representation, obj):
+        """
+        Prompt the model to check if there is an object {object} that is small in the image.
+        """
+        prompt = f"Does the image contain any '{obj}' that is relatively small in size compared to the other objects? Answer with 'YES' or 'NO'."
+
+        if not obj:
+            print("Object name is None (None)!")
+            return False
+
+        if obj == "None":
+            print("Object name is None (str)!")
+            return False
+
+        response = prompter.prompt_with_images(
+            prompt_text=prompt, paths=[img_representation]
+        )
+        response = response.strip().upper()
+
+        return parse_bool(response)
+
+    def _exists_object_large_in_img(img_representation):
+        return lambda obj: __exists_object_large_in_img(img_representation, obj)
+
+    def __exists_object_large_in_img(img_representation, obj):
+        """
+        Prompt the model to check if there is an object {object} that is large in the image.
+        """
+        prompt = f"Does the image contain any '{obj}' that is relatively large in size compared to the other objects? Answer with 'YES' or 'NO'."
+
+        if not obj:
+            print("Object name is None (None)!")
+            return False
+
+        if obj == "None":
+            print("Object name is None (str)!")
+            return False
+
+        response = prompter.prompt_with_images(
+            prompt_text=prompt, paths=[img_representation]
+        )
+        response = response.strip().upper()
+
+        return parse_bool(response)
+
+    def _exists_object_with_property_small_in_img(img_representation):
+        return lambda obj: lambda prop: __exists_object_with_property_small_in_img(
+            img_representation, obj, prop
+        )
+
+    def __exists_object_with_property_small_in_img(
+        img_representation, obj, prop, no_metal_sphere=False
+    ):
+        """
+        Prompt the model to check if there is an object {object} with property {property} that is small in the image.
+        """
+        if (
+            no_metal_sphere
+            and obj in ["sphere", "ball", "egg"]
+            and prop in ["metal", "metallic", "shiny"]
+        ):
+            print("Skipping metal sphere check as per the flag.")
+            return False
+
+        prompt = f"Does the image contain any '{obj}' with the property '{prop}' that is relatively small in size compared to the other objects? Answer with 'YES' or 'NO'."
+
+        if not obj or not prop:
+            print("Object name or property is None!")
+            return False
+
+        if obj == "None" or prop == "None":
+            print("Object name or property is None (str)!")
+            return False
+
+        response = prompter.prompt_with_images(
+            prompt_text=prompt, paths=[img_representation]
+        )
+        response = response.strip().upper()
+
+        return parse_bool(response)
+
+    def _exists_object_with_property_small_in_img_xil(img_representation):
+        return lambda obj: lambda prop: __exists_object_with_property_small_in_img(
+            img_representation, obj, prop, no_metal_sphere=True
+        )
+
+    def _exists_object_with_property_large_in_img(img_representation):
+        return lambda obj: lambda prop: __exists_object_with_property_large_in_img(
+            img_representation, obj, prop
+        )
+
+    def __exists_object_with_property_large_in_img(img_representation, obj, prop):
+        """
+        Prompt the model to check if there is an object {object} with property {property} that is large in the image.
+        """
+        prompt = f"Does the image contain any '{obj}' with the property '{prop}' that is relatively large in size compared to the other objects? Answer with 'YES' or 'NO'."
+
+        if not obj or not prop:
+            print("Object name or property is None!")
+            return False
+
+        if obj == "None" or prop == "None":
+            print("Object name or property is None (str)!")
+            return False
+
+        response = prompter.prompt_with_images(
+            prompt_text=prompt, paths=[img_representation]
+        )
+        response = response.strip().upper()
+
+        return parse_bool(response)
+
+
+    #### ----------------------------------------------------------------- ####
+    #### Done with the DSL functions, now we can create the DSL. ####
+
+
+    semantics = {
+        "get_objects": _objects_from_img,
+        "get_actions": _actions_from_img,
+        "exists_object": _exists_object_in_img,
+        "exists_object_with_property": _exists_object_with_property,
+        "exists_property": _exists_property,
+        "exists_properties": _exists_properties,
+        "exists_object_with_properties": _exists_object_with_properties,
+        "exists_action": _exists_action_in_img,
+        "exists_action_with_object": _exists_action_with_object_in_img,
+        "count_object_in_img": _count_object_in_img,  # experimental
+        "count_objects_with_property": _count_objects_with_property,  # experimental
+        "max_objects_of_same_type": _max_objects_of_same_type,  # experimental
+        "count_all_objects": _count_all_objects,  # experimental
+        "gt?": _gt,
+        "eq?": _eq,
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 6,
+        # "get_sceneries": _get_sceneries_from_img,
+        # "exists_scenery": _exists_scenery_in_img,
+        "and": lambda bool1: lambda bool2: bool1 and bool2,
+        "or": lambda bool1: lambda bool2: bool1 or bool2,
+        # "xor": lambda bool1: lambda bool2: bool1 ^ bool2,
+        "not": lambda bool: not bool,
+    }
+
+    primitive_types = {
+        "get_objects": Arrow(IMG, List(List(STRING))),
+        "get_actions": Arrow(IMG, List(List(STRING))),
+        "exists_object": Arrow(List(List(STRING)), Arrow(OBJECT, BOOL)),
+        "exists_object_with_property": Arrow(
+            List(List(STRING)), Arrow(OBJECT, Arrow(PROPERTY, BOOL))
+        ),
+        "exists_property": Arrow(List(List(STRING)), Arrow(PROPERTY, BOOL)),
+        "exists_properties": Arrow(
+            List(List(STRING)), Arrow(PROPERTY, Arrow(PROPERTY, BOOL))
+        ),
+        "exists_object_with_properties": Arrow(
+            List(List(STRING)),
+            Arrow(OBJECT, Arrow(PROPERTY, Arrow(PROPERTY, BOOL))),
+        ),
+        "exists_action": Arrow(List(List(STRING)), Arrow(ACTION, BOOL)),
+        "exists_action_with_object": Arrow(
+            List(List(STRING)), Arrow(ACTION, Arrow(OBJECT, BOOL))
+        ),
+        "count_object_in_img": Arrow(
+            List(List(STRING)), Arrow(OBJECT, INT)
+        ),  
+        "count_objects_with_property": Arrow(  # experimental
+            List(List(STRING)), Arrow(PROPERTY, INT)
+        ),
+        "max_objects_of_same_type": Arrow(List(List(STRING)), INT),  # experimental
+        "count_all_objects": Arrow(List(List(STRING)), INT),  # experimental
+        "gt?": Arrow(INT, Arrow(INT, BOOL)),
+        "eq?": Arrow(INT, Arrow(INT, BOOL)),
+        "0": INT,
+        "1": INT,
+        "2": INT,
+        "3": INT,
+        "4": INT,
+        "5": INT,
+        "6": INT,
+        "and": Arrow(BOOL, Arrow(BOOL, BOOL)),
+        "or": Arrow(BOOL, Arrow(BOOL, BOOL)),
+        "not": Arrow(BOOL, BOOL),
+    }
+
+    return semantics, primitive_types
+```
+
+This DSL is designed to detect complex concepts in real-world images. 
+You are provided with some new images now. Please examine the DSL and evaluate how to update it for the images. You are allowed to invent new functions and types, come up with around 3 new functions. Provide the python file with the new DSL. 
