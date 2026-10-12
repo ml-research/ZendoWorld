@@ -240,7 +240,7 @@
                         </p>
                     </div>
                     <div class="hero-body has-text-centered">
-                        <img src="./static/images/zendo_steps.png" class="figure-image"
+                        <img src="./static/images/steps_v9.png" class="figure-image"
                             alt="Overview of the ZendoWorld interaction loop (Initialization, Experimentation, Hypothesis Induction)." />
                     </div>
                 </div>
@@ -320,22 +320,28 @@
                         <h2 class="title is-3 has-text-centered">Results: Humans Still Outperform AI Agents</h2>
                         <div class="content has-text-justified">
                             <p>
-                                Across 22 evaluation games, no learned agent approaches the neuro-symbolic Oracle,
-                                and all fall well below human participants. The pure VLM Agent is the strongest of the
-                                learned baselines (44.5% wins), but methods designed to add structure (Bayesian
-                                (13.6%) and VLP (18.2%)) do not close the gap. Humans solve at least 50% of
-                                games across every complexity class, whereas VLM-based agents degrade sharply from
-                                first-order to compositional rules.
+                                Across 28 evaluation games, no learned agent comes close to the neuro-symbolic Oracle, 
+                                and all substantially underperform human participants on the subset of games attempted by humans. 
+                                Among the learned baselines, the VLM Agent with gpt-5-mini and the VLP Agent with gpt-5.6-terra achieve 
+                                the highest win rates (35.7%), while the Bayesian Agent performs best with gpt-5.6-terra, 
+                                reaching a solve rate of 27.1%. In contrast, the Oracle achieves a 92.1% win rate. 
+                                Human participants solve at least 50% of games in every complexity class, whereas VLM-based agents exhibit 
+                                a sharp decline in performance as rule complexity increases from first-order to compositional.
                             </p>
                         </div>
-                        <div class="hero-body has-text-centered">
-                            <img src="./static/images/win_rate_gap_vs_human.png" class="figure-image narrow"
-                                alt="Win rate per complexity class for humans and AI agents." />
-                        </div>
+                        <figure class="hero-body has-text-centered">
+                            <img src="./static/images/win_rate_gap_vs_human.png"
+                                class="figure-image narrow"
+                                alt="Win rate per complexity class for humans and AI agents, constrained to the subset attempted by humans." />
+                            <figcaption>
+                                Win rate per complexity class for humans and AI agents,
+                                constrained to the subset attempted by humans.
+                            </figcaption>
+                        </figure>
                         <div class="content has-text-justified">
                             <p>
                                 Ablating visual input by feeding agents symbolic Prolog-style scene descriptions
-                                improves every learned agent (the VLP Agent gains over 160%), confirming that
+                                improves most learned agents (the VLP Agent gains over 160%), confirming that
                                 <strong>perception is a key bottleneck</strong>. Yet even in the symbolic setting no
                                 agent matches the Oracle, showing that <strong>induction is a second, independent
                                 bottleneck</strong>. Finally, an expected-information-gain analysis reveals that
